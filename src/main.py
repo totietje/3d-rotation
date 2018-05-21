@@ -5,9 +5,9 @@ import numpy as np
 import rotation
 import util
 
-ARROW_LENGTH = 15
+ARROW_LENGTH = 0.2
 
-SETTINGS = util.Settings(initial_angular_velocity=np.array([0.00000000000000001, 3, 0.00000000000000001]), total_time=60)
+SETTINGS = util.Settings(initial_angular_velocity=np.array([.1, 3, .1]), total_time=20)
 
 
 def to_vec(arr):
@@ -15,21 +15,21 @@ def to_vec(arr):
 
 
 box = box(size=to_vec(SETTINGS.dimensions))
-angular_velocity_arrow = arrow(shaftwidth=1, color=color.green)
+angular_velocity_arrow = arrow(shaftwidth=0.01, color=color.green)
 
 angular_momentum = SETTINGS.angular_momentum
 angular_momentum_direction = angular_momentum / np.sqrt(np.dot(angular_momentum, angular_momentum))
 
-angular_momentum_arrow = arrow(axis=to_vec(angular_momentum_direction * 60), shaftwidth=1, color=color.red)
+angular_momentum_arrow = arrow(axis=to_vec(angular_momentum_direction * ARROW_LENGTH), shaftwidth=0.01, color=color.red)
 
 
 def set_box_rotation(rot):
-	box.axis = to_vec(rot[:, 0])
-	box.up = to_vec(rot[:, 1])
+	box.axis = to_vec(rot[:, 0]) * SETTINGS.dimensions[0]
+	box.up = to_vec(rot[:, 1]) * SETTINGS.dimensions[1]
 
 
 def set_angular_velocity_arrow(omega):
-	angular_velocity_arrow.axis = to_vec(omega * ARROW_LENGTH)
+	angular_velocity_arrow.axis = to_vec(omega * 0.1)
 
 
 set_box_rotation(SETTINGS.initial_rotation)

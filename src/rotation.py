@@ -1,25 +1,19 @@
 import numpy as np
 
 
-# Generates a matrix that rotates a point |by| radians about the axis 'by'
-# Black magic copy pasted from stackoverflow
-def _rotation_matrix(by):
+def _rotation_matrix(omega, delta_time):
 	"""
 	Return the rotation matrix associated with counterclockwise rotation about
 	the given unit vector axis by theta radians.
 	"""
 
-	theta = np.sqrt(np.dot(by, by))
-	axis = np.asarray(by) / theta
+	theta = omega * delta_time
+	x, y, z = theta[0], theta[1], theta[2]
 
-	a = np.cos(theta / 2.0)
-	b, c, d = -axis * np.sin(theta / 2.0)
-	aa, bb, cc, dd = a * a, b * b, c * c, d * d
-	bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
 	return np.array([
-		[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
-		[2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
-		[2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]
+		[ 1, -z,  y],
+		[ z,  1, -x],
+		[-y,  x,  1],
 	])
 
 
@@ -31,17 +25,19 @@ def model_rotation(settings):
 	rotation = settings.initial_rotation
 	angular_momentum = settings.angular_momentum
 
+	inverse_moment_of_inertia = np.linalg.inv(moment_of_inertia)
+
 	rotations = {}
 
 	for i in range(int(total_time / delta_time)):
 		rotations[i] = (rotation, angular_velocity)
 
 		# Rotate by angular velocity
-		rotation = _rotation_matrix(angular_velocity * delta_time) @ rotation
+		rotation = _rotation_matrix(angular_velocity, delta_time) @ rotation
 		
 		# Calculate new angular velocity based on new rotation & constant angular momentum
 		# Rotating angular momentum by the box's rotation yields angular momentum from the box's perspective
-		# Use H = I * omega, omega = I^-1 * H
-		angular_velocity = np.linalg.inv(moment_of_inertia) @ rotation @ angular_momentum
+		# Use L = I * omega, omega = I^-1 * L
+		angular_velocity = rotation @ inverse_moment_of_inertia @ rotation.T @ angular_momentum
 
 	return rotations

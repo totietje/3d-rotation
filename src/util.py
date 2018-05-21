@@ -2,7 +2,7 @@ import numpy as np
 
 
 def _angular_momentum(rotation, angular_velocity, moment_of_inertia):
-	return np.linalg.inv(rotation) @ moment_of_inertia @ angular_velocity
+	return rotation @ moment_of_inertia @ rotation.T @ angular_velocity
 
 
 def _moment_of_inertia(mass, dimensions):
@@ -28,12 +28,9 @@ class Settings:
 		self.initial_rotation = initial_rotation
 
 		if dimensions is None:
-			self.dimensions = [20, 50, 100]
+			self.dimensions = [.01, .3, .8]
 		else:
 			self.dimensions = dimensions
 
 		self.moment_of_inertia = _moment_of_inertia(self.mass, self.dimensions)
-		print(self.moment_of_inertia)
 		self.angular_momentum = _angular_momentum(self.initial_rotation, self.initial_angular_velocity, self.moment_of_inertia)
-		print(self.initial_angular_velocity)
-		print(self.angular_momentum)
