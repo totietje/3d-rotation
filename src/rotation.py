@@ -2,11 +2,6 @@ import numpy as np
 
 
 def _rotation_matrix(omega, delta_time):
-	"""
-	Return the rotation matrix associated with counterclockwise rotation about
-	the given unit vector axis by theta radians.
-	"""
-
 	theta = omega * delta_time
 	x, y, z = theta[0], theta[1], theta[2]
 
@@ -35,9 +30,7 @@ def model_rotation(settings):
 		# Rotate by angular velocity
 		rotation = _rotation_matrix(angular_velocity, delta_time) @ rotation
 		
-		# Calculate new angular velocity based on new rotation & constant angular momentum
-		# Rotating angular momentum by the box's rotation yields angular momentum from the box's perspective
-		# Use L = I * omega, omega = I^-1 * L
+		# Based on new rotation and conservation of linear momentum, calculate new angular velocity
 		angular_velocity = rotation @ inverse_moment_of_inertia @ rotation.T @ angular_momentum
 
 	return rotations
