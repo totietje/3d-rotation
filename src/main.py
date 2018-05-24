@@ -4,25 +4,13 @@ from vpython import vector, box, arrow, color
 import numpy as np
 import rotation
 import util
-
-def _moment_of_inertia(mass, dimensions):
-	def _inertia(i, j):
-		a = dimensions[i]
-		b = dimensions[j]
-
-		return (mass * (a * a + b * b)) / 12
-
-	return np.array([
-		[_inertia(1, 2), 0, 0],
-		[0, _inertia(0, 2), 0],
-		[0, 0, _inertia(0, 1)],
-	])
+from moments_of_inertia import cuboid_inertia
 
 ARROW_LENGTH = 0.2
 # [.01, .3, .8]
 DIMENSIONS = [.01, .3, .8]
 
-SETTINGS = util.Settings(initial_angular_velocity=np.array([.1, 3, .1]), total_time=20, moment_of_inertia=_moment_of_inertia(1, DIMENSIONS))
+SETTINGS = util.Settings(initial_angular_velocity=np.array([.1, 3, .1]), total_time=20, moment_of_inertia=cuboid_inertia(DIMENSIONS))
 
 def to_vec(arr):
 	return vector(arr[0], arr[1], arr[2])
@@ -50,6 +38,7 @@ set_box_rotation(SETTINGS.initial_rotation)
 set_angular_velocity_arrow(SETTINGS.initial_angular_velocity)
 
 
+# Calculate motion of cuboid over time beforehand - render it later
 states = rotation.model_rotation(SETTINGS)
 
 t0 = time.time()
