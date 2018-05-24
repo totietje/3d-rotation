@@ -5,32 +5,12 @@ def _angular_momentum(rotation, angular_velocity, moment_of_inertia):
 	return rotation @ moment_of_inertia @ rotation.T @ angular_velocity
 
 
-def _moment_of_inertia(mass, dimensions):
-	def _inertia(i, j):
-		a = dimensions[i]
-		b = dimensions[j]
-
-		return (mass * (a * a + b * b)) / 12
-
-	return np.array([
-		[_inertia(1, 2), 0, 0],
-		[0, _inertia(0, 2), 0],
-		[0, 0, _inertia(0, 1)],
-	])
-
-
 class Settings:
-	def __init__(self, initial_angular_velocity, delta_time=0.0001, total_time=20, dimensions=None, mass=1, initial_rotation=np.identity(3)):
+	def __init__(self, initial_angular_velocity, moment_of_inertia, delta_time=0.0001, total_time=20, initial_rotation=np.identity(3)):
 		self.initial_angular_velocity = initial_angular_velocity
-		self.mass = mass
 		self.total_time = total_time
 		self.delta_time = delta_time
 		self.initial_rotation = initial_rotation
+		self.moment_of_inertia = moment_of_inertia
 
-		if dimensions is None:
-			self.dimensions = [.01, .3, .8]
-		else:
-			self.dimensions = dimensions
-
-		self.moment_of_inertia = _moment_of_inertia(self.mass, self.dimensions)
 		self.angular_momentum = _angular_momentum(self.initial_rotation, self.initial_angular_velocity, self.moment_of_inertia)
